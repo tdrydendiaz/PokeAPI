@@ -11,6 +11,7 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.bae.entity.SearchLogs;
 import com.bae.entity.User;
 import com.bae.repository.UserRepo;
 
@@ -69,31 +70,45 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public Optional<User> getAUser(Long id) {
-		// TODO Auto-generated method stub
-		return null;
+		Optional<User> user = repo.findById(id);
+		return user;
 	}
-
-
 	
 	@Override
 	public String search(Long id, String searchTerm) {
-		Optional<User> userlog = repo.findById(id);
-		if (userlog.isPresent()) {
-			ResponseEntity<String> search = restTemplate.exchange("http://localhost:8086/search/find/" + searchTerm,
+		
+		Optional<User> optUser =  repo.findById(id);
+		
+		if(optUser.isPresent()) {
+			
+			
+			//create that SearchLogs object
+			
+			//sending search logs to q
+	
+			//get body localhost:8086/search/ restteamplate
+			ResponseEntity<String> search = restTemplate.exchange("http://localhost:8086/search/"+ id + searchTerm,
 					HttpMethod.GET, null, String.class);
 			String searchResult = search.getBody();
-			User user = userlog.get();
-			sendToQueue(user, searchTerm);
-			return searchResult;
-		} else {
-			return "{\"message\": \"user cannot be found\"}";
-		}
-
-	}
-
-	private void sendToQueue(User user, String searchTerm) {
-		// TODO Auto-generated method stub
+			User user=optUser.get();
+			
+			sendtoQueue(user, searchTerm);
+			
+		}else {
+			
+			return "user doesnt exist";
+			
+		}	
 		
+		return "";
 	}
+
+	private void sendtoQueue(User user, String searchTerm) {
+		
+		SearchLogs newLog = new SearchLogs();
+		jmsTemplate.convertAndSend("UserQueue", newLog);
+	}
+
+
 
 }

@@ -1,12 +1,14 @@
 package com.bae.controller;
 
 import java.util.Collection;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -48,4 +50,14 @@ public class UserController {
 		return service.updateUser(user);
 	}
 	
+	@GetMapping("/getAUser/{id}")
+	public Optional<User> getAUser(@PathVariable("id") Long id) {
+		return service.getAUser(id);
+	}
+
+	@GetMapping("/search/{id}/{searchTerm}")
+	public String search(@PathVariable("id") Long id, @PathVariable("searchTerm") String searchTerm) {
+		return service.search(id, searchTerm);
+	}
+
 }
